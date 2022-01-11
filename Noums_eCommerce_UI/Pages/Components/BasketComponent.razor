@@ -1,45 +1,39 @@
 ﻿@using Domains;
-@implements IDisposable
 @if (LocalCart != null)
 {
-    @foreach (var cartItem in LocalCart.ListProducts)
-    {
-        <p>
-            @cartItem.ProductName
-            @cartItem.ProductQuantity
-        </p>
+    <div class="text-light ">
+        @foreach (var cartItem in LocalCart.ListProducts)
+        {
 
-    } if (LocalCart.ListProducts.Count() <= 0)
+            <p>
+                @cartItem.ProductName
+               <span>Qte:</span> @cartItem.ProductQuantity
+            </p>
+
+        }
+    </div>
+
+    @if (LocalCart.ListProducts.Count() <= 0)
     {
-        <span>0</span>
+        <span class="text-light"> 0</span>
     }
-
 
 
 
 
 }
 else
-{ <span>0</span>
+{ <span class="text-light">0</span>
 
 
 }
 
 
-
-
-<p>
-
-</p>
 @code{
 
 
     [Parameter] public Cart LocalCart { get; set; }
 
-    public void Dispose()
-    {
 
-
-    }
 
 } 
