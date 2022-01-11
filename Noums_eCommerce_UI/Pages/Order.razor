@@ -1,0 +1,114 @@
+﻿@page "/Order"
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Identity
+
+
+<div>
+
+    @if (LocalCart != null)
+    {
+
+
+        @foreach (var cartItem in LocalCart.ListProducts)
+        {
+
+            <p>name: @cartItem.ProductName</p>
+            <p>quantity:@cartItem.ProductQuantity </p>
+            <p>sales price: @cartItem.ProductPrice</p>
+            <p>Total par produit Ht: @cartItem.TotalItem.ToString("C")</p>
+            <button class="btn btn-primary" type="button" @onclick="() => ExecuteDeleteCartItem(cartItem.ProductId)">- </button>
+            <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(cartItem.ProductId)"> + </button>
+
+        }
+
+
+
+
+        @if (LocalCart.TotalAllItems > 0)
+        {
+
+            <span>Total: @LocalCart.ListProducts.Sum(a => a.TotalItem)</span>
+            <button class="btn btn-danger" type="button" @onclick="ExecuteClearCart">vider le panier</button>
+
+            @if (@User.UserName != null)
+            {
+
+
+                <form>
+                    paiement direct
+                </form>
+
+            }
+            else
+            {
+                <form>
+                    formulaire de paiement  recup infos livraison
+                </form>
+            }
+        }
+        else
+        {
+            <p>Votre panier est vide</p>
+        }
+    }
+    else
+    {
+        <p>Votre panier est vide</p>
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+@code{
+    [Inject] ICart carteService { get; set; }
+    [Inject] IProduct productService { get; set; }
+    [Inject] UserManager<AppUser> userManager { get; set; }
+    [Inject] AppUser User { get; set; }
+    [Inject] IHttpContextAccessor httpContextAccessor { get; set; }
+    private IEnumerable<Product> ProductsIncludePictures { get; set; }
+    private Cart LocalCart { get; set; }
+    [CascadingParameter]
+    private EventCallback notify { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
+        LocalCart = await carteService.InitializeShoppingCart();
+        User.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
+        if (User.UserName != null)
+        {
+            User = await userManager.FindByNameAsync(User.UserName);
+
+        }
+        base.OnInitialized();
+    }
+    protected async Task ExecuteAddtoCart(int IdProduct)
+    {
+        await carteService.AddCart(IdProduct);
+        await notify.InvokeAsync();
+    }
+    protected async Task ExecuteDeleteCartItem(int IdProduct)
+    {
+        await carteService.DeleteItem(IdProduct);
+        await notify.InvokeAsync();
+    }
+
+    protected async Task ExecuteClearCart()
+    {
+        await carteService.ClearCart();
+        await notify.InvokeAsync();
+    }
+}

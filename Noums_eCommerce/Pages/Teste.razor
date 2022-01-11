@@ -1,0 +1,20 @@
+﻿@inherits ProductsModel
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
+<h3>teste</h3>
+@foreach (var product in ProductsIncludePictures.ToList())
+{
+    <div class="cardChild my-2">
+
+
+        <img src="~/../images/ProductsImages/@product.ImageUrl.ToString()" class="img-fluid" alt="@product.SeoName" />
+
+    </div>
+    @code {
+       
+        protected override async Task OnParametersSetAsync()
+        {
+            _Cart = await LocalStorage.GetItemAsync<Cart>("Cart");
+        }
+}
+}

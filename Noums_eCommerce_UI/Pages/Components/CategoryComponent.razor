@@ -1,0 +1,27 @@
+﻿
+
+@if (categories != null)
+{
+    @foreach (var category in categories)
+    {
+        <li>
+            @category.CategoryName
+        </li>
+    }
+}
+
+
+
+
+
+@code {
+    [Inject] public ICategory categoryService { get; set; }
+
+    public IEnumerable<Domains.Category> categories { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await categoryService.GetAllCategoryAsync();
+    }
+
+
+}

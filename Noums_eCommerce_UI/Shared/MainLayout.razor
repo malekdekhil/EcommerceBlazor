@@ -1,0 +1,50 @@
+﻿@inherits LayoutComponentBase
+ <div class="page">
+    <div class="sidebar">
+        <CascadingValue Value="LocalCart">
+            <NavMenu />
+        </CascadingValue>
+
+    </div>
+    <div class="main">
+        <div class="top-row px-4 auth">
+            <LoginDisplay />
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+        <div class="content px-4">
+            
+            <CascadingValue Value="event_notify">
+                @Body
+            </CascadingValue>
+
+        </div>
+    </div>
+</div>
+@code{
+    [Inject] ICart carteService { get; set; }
+
+    protected Cart LocalCart { get; set; }
+
+    EventCallback event_notify => EventCallback.Factory.Create(this, NotifyLayout);
+
+    private async Task NotifyLayout()
+    {
+        LocalCart = await carteService.InitializeShoppingCart();
+        if(LocalCart != null)
+        {
+            StateHasChanged();
+
+        }
+    }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await NotifyLayout();
+
+        }
+
+    }
+}

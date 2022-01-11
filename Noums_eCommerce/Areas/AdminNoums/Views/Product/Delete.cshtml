@@ -1,0 +1,29 @@
+﻿@model Domains.Product
+
+@{
+    ViewData["Title"] = "Delete";
+}
+<h4 class="text-center my-5">
+    êtes-vous sûr de vouloir supprimer l'article  @Model.Name.ToLower() ?
+</h4>
+<div class="text-center">
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ImageUrl" class="form-control" />
+        <input type="hidden" asp-for="IdProduct" class="form-control" />
+
+        <input type="submit" value="Supprimer" class="btn btn-danger" /> |
+        <a asp-action="Index">Annuler</a>
+
+    </form>
+    <div class="text-center" style="margin:150px 0px">
+        <p class="text-center text-danger"style="font-size:20px;">Attention vous êtes sur le point de supprimer l'(es) image(s) ci-dessous de votres base de données et du disque </p>
+        <img src="/images/ProductsImages/@Model.ImageUrl" />
+        @foreach (var i in @ViewBag.ListPicture)
+        {
+            <img src="/images/Pictures/@i.UrlPicture" />
+            
+        }
+    </div>
+   
+</div>
