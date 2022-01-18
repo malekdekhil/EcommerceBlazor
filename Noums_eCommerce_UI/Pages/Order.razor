@@ -20,9 +20,7 @@
             <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(cartItem.ProductId)"> + </button>
 
         }
-
-
-
+ 
 
         @if (LocalCart.TotalAllItems > 0)
         {
@@ -93,7 +91,7 @@
             User = await userManager.FindByNameAsync(User.UserName);
 
         }
-        base.OnInitialized();
+        await base.OnInitializedAsync();
     }
     protected async Task ExecuteAddtoCart(int IdProduct)
     {

@@ -1,39 +1,37 @@
-﻿@using Domains;
-@if (LocalCart != null)
-{
-    <div class="text-light ">
-        @foreach (var cartItem in LocalCart.ListProducts)
-        {
-
-            <p>
-                @cartItem.ProductName
-               <span>Qte:</span> @cartItem.ProductQuantity
-            </p>
-
-        }
-    </div>
-
-    @if (LocalCart.ListProducts.Count() <= 0)
+﻿<a id="changeBasketD" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    @if (LocalCart != null)
     {
-        <span class="text-light"> 0</span>
+        if (LocalCart.Total > 0)
+        {
+            @LocalCart.Total.ToString("C");
+        }
+        else
+        {
+            var total = 0;
+            <span>@total.ToString("C")</span>
+        }
     }
-
-
-
-
-}
-else
-{ <span class="text-light">0</span>
-
-
-}
-
-
+    else
+    {
+        var total = 0;
+        <span>@total.ToString("C")</span>
+    }
+</a>
+<ul id="changeBasketD" class="dropdown-menu text-center w-100 " aria-labelledby="navbarDropdown">
+    @if (LocalCart != null && LocalCart.Total > 0)
+    {
+        @foreach (var item in LocalCart.ListProducts.ToList())
+        {
+            <li class="mx-1 bg-light"><strong>@item.ProductName</strong></li>
+            <li class=" mx-1 bg-light mb-2">Quantité(s): @item.ProductQuantity</li>
+        }
+    }
+    else
+    {
+        var Empty = "Votre panier est vide";
+        <li class="nav-item"> @Empty.ToString()</li>
+    }
+</ul>
 @code{
-
-
     [Parameter] public Cart LocalCart { get; set; }
-
-
-
-} 
+}

@@ -4,7 +4,6 @@
 @{
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,15 +11,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Noums_eCommerce_UI</title>
     <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/icofont/icofont.min.css">
     <link href="css/site.css" rel="stylesheet" />
     <link href="Noums_eCommerce_UI.styles.css" rel="stylesheet" />
 </head>
- 
 <body>
-
     <component type="typeof(App)" render-mode="Server" />
-     <div id="blazor-error-ui">
+    <div id="blazor-error-ui">
         <environment include="Staging,Production">
             An error has occurred. This application may no longer respond until reloaded.
         </environment>
@@ -31,5 +29,6 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.server.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

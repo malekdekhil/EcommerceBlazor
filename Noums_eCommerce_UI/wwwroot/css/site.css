@@ -48,3 +48,59 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.containerCard {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.cardTitle {
+    font-size: 1.6rem;
+    font-weight: 400;
+}
+/*btn*/
+.btnAddAcc {
+    border-radius: 1rem;
+    border: none;
+    padding: 8px;
+    transition: all 1s ease-out;
+}
+
+    .btnAddAcc:hover {
+         background: #000000;
+        transition: all 1s ease-in;
+        border: none;
+        box-shadow: 0 .25rem .75rem rgb(128 128 128);
+    }
+/*card*/
+.cardChild {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+}
+
+    .cardChild:hover {
+        box-shadow: 0 .25rem .75rem rgb(128 128 128);
+    }
+
+
+.containerCard {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.cardLinkContainer {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.cardTitle {
+    font-size: 1.2rem;
+    margin: 5px 0 15px 0;
+    font-weight: 400;
+}

@@ -1,54 +1,76 @@
 ﻿@page "/"
-@if (ProductsIncludePictures != null)
-{
-    @foreach (var product in ProductsIncludePictures.ToList())
+<section class="container-fluid mt-5 pt-5">
+    @if (ProductsIncludePictures != null)
     {
-        <div class="cardChild my-2">
-            <img src="~/../images/ProductsImages/@product.ImageUrl.ToString()" class="img-fluid" alt="@product.SeoName" />
-            <p class="card-group">
-                @foreach (var picture in product.Pictures.ToList())
-                {
-                    <button @onclick="() => productService.GetPicturePath(picture.IdPictures, product.IdProduct)">
-                        <img src="~/../images/ProductsImages/Pictures/@picture.UrlPicture" class="img-fluid" style="height:100px" alt="@product.SeoName" />
-                    </button>
-                }
-            </p>
-            <h1 class="cardTitle">@product.Name</h1>
-            <a href="Details/@product.IdProduct">Details</a>
-            <p class="cardLinkContainer">
-                @if (product.Quantity > 0)
-                {
-                    <span>@product.IdProduct</span>
-                    <span>@product.SalesPrice</span>
-                    <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct) "> + </button>
-                    <button class="btn btn-primary" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)"> - </button>
-                }
-                else
-                {
-                    <button class="btn btn-dark btnAddAcc d-block">
-                        Rupture de stock
-                    </button>
-                }
-            </p>
+        <div class="containerCard">
+            @foreach (var product in ProductsIncludePictures.ToList())
+            {
+                <div class="cardChild my-2  containerCard">
+
+                    <div>
+                        <img src="~/../images/ProductsImages/@product.ImageUrl.ToString()" class="img-fluid" alt="@product.SeoName" />
+                        <p class="card-group  d-flex justify-content-around my-1   py-1">
+                            @foreach (var picture in product.Pictures.ToList())
+                            {
+                                <button @onclick="() => productService.GetPicturePath(picture.IdPictures, product.IdProduct)">
+                                    <img src="~/../images/ProductsImages/Pictures/@picture.UrlPicture" class="img-fluid" style="height:75px" alt="@product.SeoName" />
+                                </button>
+                            }
+                        </p>
+                        <p class="d-flex justify-content-between align-items-center my-0">
+                            <h1 class="cardTitle">@product.Name</h1>
+                            <a href="Details/@product.IdProduct">Details</a>
+                        </p>
+                        <p class="d-flex justify-content-between align-items-center">
+
+                            @if (product.Quantity > 0)
+                            {
+                                <button class="btn btn-dark btnAddAcc d-block" type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct) ">
+                                    Ajouter                             <span>@product.SalesPrice.ToString("C")</span>
+                                </button>
+                                <button class="btn btn-dark btnAddAcc d-block" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)">-</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-dark btnAddAcc d-block">
+                                    Rupture de stock
+                                </button>
+                            }
+                        </p>
+                    </div>
+                </div>
+            }
+
         </div>
     }
-}
- 
+</section>
+
 
 @code{
     [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
     private IEnumerable<Product> ProductsIncludePictures { get; set; }
     private Cart LocalCart { get; set; }
+
     [CascadingParameter]
     private EventCallback notify { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
+
+            await CheckDisponibility(ProductsIncludePictures.ToList());
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
     protected override async Task OnInitializedAsync()
     {
-
-        ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
         LocalCart = await carteService.InitializeShoppingCart();
 
-        base.OnInitialized();
+
+        await base.OnInitializedAsync();
     }
     protected async Task ExecuteAddtoCart(int IdProduct)
     {
@@ -56,15 +78,15 @@
         await notify.InvokeAsync();
 
     }
-
     protected async Task ExecuteDeleteCartItem(int IdProduct)
     {
         await carteService.DeleteItem(IdProduct);
         await notify.InvokeAsync();
-
-
-
     }
-
+    protected async Task CheckDisponibility(List<Product> Products)
+    {
+        await carteService.CheckDisponibility(Products);
+        await notify.InvokeAsync();
+    }
 
 }

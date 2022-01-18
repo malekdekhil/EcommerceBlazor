@@ -14,8 +14,6 @@ namespace Noums_eCommerce_UI.Areas.AdminNoums.Controllers
 
     public class CategoryController : Controller
     {
-        
-
         readonly ICategory categoryService;
         readonly IProduct productService;
         readonly IPicture pictureService;

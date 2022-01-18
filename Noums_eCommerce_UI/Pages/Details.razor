@@ -12,13 +12,8 @@
         <span>@product.SalesPrice</span>
         <button class="btn btn-primary" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)">- </button>
         <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct)"> + </button>
-
-
-
-
-
     }
-  
+
     if (@User.UserName != null)
     {
         <form>
@@ -33,23 +28,22 @@
 
 @code {
     [Parameter] public int idProduct { get; set; }
-    [CascadingParameter] public EventCallback notify { get; set; }
+    [CascadingParameter] private EventCallback notify { get; set; }
     [Inject] IProduct productService { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] NavigationManager navigationManager { get; set; }
     [Inject] UserManager<AppUser> userManager { get; set; }
     [Inject] AppUser User { get; set; }
     [Inject] IHttpContextAccessor httpContextAccessor { get; set; }
-
+    private Cart LocalCart { get; set; }
     private Product product { get; set; }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        product = await productService.GetProductByIdAsync(idProduct);
-        await base.OnParametersSetAsync();
-    }
+
     protected override async Task OnInitializedAsync()
     {
+        product = await productService.GetProductByIdAsync(idProduct);
+        LocalCart = await carteService.InitializeShoppingCart();
+
         User.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
         if (User.UserName != null)
         {

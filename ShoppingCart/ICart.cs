@@ -5,17 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domains;
 
 namespace ShoppingCart
 {
     public interface ICart
     {
-        Cart getAll();
         Task<Cart> AddCart(int id);
         Task<Cart> InitializeShoppingCart();
         Task ClearCart();
         Task DeleteCartItem(int id);
         Task DeleteItem(int id);
- 
+        public Task CheckDisponibility(List<Product> allProductsEmpty);
+
     }
 }

@@ -1,47 +1,83 @@
-﻿
-<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Noums_eCommerce_UI</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/Order">
-                <span class="oi oi-plus" aria-hidden="true"></span> Order
-            </NavLink>
-        </li>
- 
-        <li class="nav-item px-3">
-            <CategoryComponent />
-        </li>
-        <li class="nav-item px-3">
- 
-            <BasketComponent LocalCart="@LocalCart"/>
- 
-        </li>
-    </ul>
-</div>
+﻿<nav id="navbar" class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 py-1 fixed-top ">
+    <div class="container-fluid">
+        <div class="navbar-brand col-3 d-flex justify-content-center w-100 mx-auto">
+            <a id="linkLogo" href="/Home/Index"><img src="~/images/Logo/logo6.png" class="imgLogo" alt="logo" /></a>
+            <h1 hidden> Logo noums</h1>
+        </div>
 
 
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-center flex-column" id="navbarSupportedContent">
+            @*---------------------------- floor 1------------------------------------------------- *@
+            <div class="navbar-nav mb-2 mb-lg-0   d-flex justify-content-lg-between w-100">
+
+                <ul class="navbar-nav col-lg-6 col-md-5 ml-md-5   w-100   ">
+
+                    <li class="nav-item   text-center w-100">
+                        <form asp-action="Search" asp-controller="Product" class=" d-flex mx-auto  ">
+                            <input class="  inputSearch  " name="term" type="search" placeholder="" aria-label="Search">
+                            <button class="btnSearch " type="submit">Trouver</button>
+                        </form>
+                    </li>
+                </ul>
+                <ul class="navbar-nav col-lg-2 col-md-4  col-sm-4 mx-md-auto ">
+                    <li class="nav-item dropdown text-center">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="icofont-ui-user"></i>
+                        </a>
+                        <ul class="dropdown-menu text-center w-100" aria-labelledby="navbarDropdown">
+                            <LoginDisplay/>
+                        </ul>
+                    </li>
+                    <li class="nav-item  text-center ">
+                        <NavLink class="nav-link" href="/Order">
+                            <i class="icofont-basket"> </i>
+                        </NavLink>
+                    </li>
+                    <li id="containBasketD" class="nav-item  text-center ">
+                        <BasketComponent LocalCart="@LocalCart" />
+                    </li>
+                    <li class="nav-item  text-center  ">
+                        <a class="nav-link" href="https://www.facebook.com/"><i class="icofont-facebook"></i></a>
+                    </li>
+                    <li class="nav-item  text-center">
+                        <a class="nav-link" href="https://www.instagram.com/"><i class="icofont-instagram"></i></a>
+                    </li>
+                </ul>
+            </div>
+            @*---------------------------- floor 2------------------------------------------------- *@
+
+            <div class="navbar-nav mt-2 mb-0 pb-0  d-flex justify-content-lg-around w-100">
+                <ul class="navbar-nav col-lg-4 col-sm-4 col-md-4 d-flex align-items-center ulCategories  w-100">
+                    <li class="nav-item   dropdown  text-center w-100">
+                        <a class="nav-link dropdown-toggle linkCategories" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Nos produits
+                        </a>
+                        <ul class="dropdown-menu text-center w-100 mx-auto " aria-labelledby="navbarDropdown">
+                            <CategoryComponent />
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav  col-lg-5 col-md-6 col-sm-5 d-flex justify-content-between ">
+                    <li class="nav-item liPage w-100  ">
+                        <a class="nav-link linkHome" href="/Home/Index">Home</a>
+                    </li>
+                    <li class="nav-item liPage  w-100 ">
+                        <a class="nav-link" href="/product/Index">Boutique</a>
+                    </li>
+                    <li class="nav-item liPage w-100  ">
+                        <a class="nav-link" href="/Home/contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
 @code {
 
     [CascadingParameter] public Cart LocalCart { get; set; }
-    private bool collapseNavMenu = true;
-
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-
+    
 }
