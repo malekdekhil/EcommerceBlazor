@@ -14,12 +14,13 @@ namespace UnitOfWorkManager
     {
         private AppDbContext db;
         private IProductRepository _Products;
+        private IPictureRepository _Pictures;
         private IRepository<Category> _Categories;
         private IRepository<Opinion> _Opinions;
         private IRepository<Order> _Orders;
         private IRepository<OrderItem> _OrderItems;
-        private IPictureRepository _Pictures;
         private IRepository<Provider> _Providers;
+        private IRepository<UserTmp> _UserTmp;
         public UnitOfWork(AppDbContext db)
         {
             this.db = db;
@@ -32,6 +33,7 @@ namespace UnitOfWorkManager
         public IRepository<OrderItem> OrderItems => _OrderItems = _OrderItems ?? new Repository<OrderItem>(db);
         public IPictureRepository Pictures => _Pictures = _Pictures ?? new PictureRepository(db);
         public IRepository<Provider> Providers => _Providers = _Providers ?? new Repository<Provider>(db);
+        public IRepository<UserTmp> UserTmp => _UserTmp = _UserTmp ?? new Repository<UserTmp>(db);
 
         public async Task<int> CommitAsync()
         {

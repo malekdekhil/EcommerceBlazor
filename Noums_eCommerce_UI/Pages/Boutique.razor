@@ -1,5 +1,5 @@
-﻿@page "/"
-<section class="container-fluid" >
+﻿@page "/Boutique"
+<section class="container-fluid">
     @if (ProductsIncludePictures != null)
     {
         <div class="containerCard">
@@ -24,7 +24,7 @@
                                     <button class="btn btn-dark d-block  " type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct) ">
                                         Ajouter                             <span>@product.SalesPrice.ToString("C")</span>
                                     </button>
-                                    <button class="btn btn-dark   d-block" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)">-</button>
+                                    <button class="btn btn-dark d-block" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)">-</button>
                                 }
                                 else
                                 {
@@ -42,11 +42,9 @@
         </div>
     }
 </section>
-
-
 @code{
-    [Inject] IProduct productService { get; set; }
     [Inject] ICart carteService { get; set; }
+    [Inject] IProduct productService { get; set; }
     private IEnumerable<Product> ProductsIncludePictures { get; set; }
     private Cart LocalCart { get; set; }
 
@@ -64,7 +62,6 @@
     }
     protected override async Task OnInitializedAsync()
     {
-
         LocalCart = await carteService.InitializeShoppingCart();
         await base.OnInitializedAsync();
     }

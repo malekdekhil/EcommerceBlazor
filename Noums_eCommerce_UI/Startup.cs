@@ -93,6 +93,9 @@ namespace Noums_eCommerce_UI
 
             //-------------Add Serives---------------------
             services.AddTransient<AppUser>();
+            services.AddTransient<IShoppingUserTmp, ShoppingUserTmp>();
+            services.AddTransient<IUserTmp, ClsUserTmp>();
+
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<ICategory, ClsCategory>();
             services.AddTransient<IProduct, ClsProduct>();

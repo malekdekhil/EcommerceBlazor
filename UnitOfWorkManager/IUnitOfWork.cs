@@ -17,6 +17,7 @@ namespace UnitOfWorkManager
         IRepository<OrderItem> OrderItems { get; }
         IPictureRepository Pictures { get; }
         IRepository<Provider> Providers { get; }
+        IRepository<UserTmp> UserTmp { get; }
         Task<int> CommitAsync();
 
     }

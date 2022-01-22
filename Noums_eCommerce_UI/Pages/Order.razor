@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Identity
 
 
-<div>
+<section>
 
     @if (LocalCart != null)
     {
@@ -20,7 +20,7 @@
             <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(cartItem.ProductId)"> + </button>
 
         }
- 
+
 
         @if (LocalCart.TotalAllItems > 0)
         {
@@ -39,6 +39,51 @@
             }
             else
             {
+                <EditForm Model="@_UserTmp">
+                    <DataAnnotationsValidator />
+                    <div class="d-flex flex-column align-items-center w-50">
+                        <p>
+                            <label for="@_UserTmp.FirstName"> </label>
+                            <InputText id="FirstName" @bind-Value="_UserTmp.FirstName" />
+                            <ValidationMessage For="() => _UserTmp.FirstName" />
+                        </p>
+                        <p>
+                            <label for="@_UserTmp.LastName"> </label>
+                            <InputText id="LastName" @bind-Value="_UserTmp.LastName" />
+                            <ValidationMessage For="() => _UserTmp.LastName" />
+                        </p>
+                        <p>
+                            <label for="@_UserTmp.EmailTmp"> </label>
+                            <InputText id="Email" @bind-Value="_UserTmp.EmailTmp" />
+                            <ValidationMessage For="() => _UserTmp.EmailTmp" />
+                        </p>
+                        <p>
+                            <label for="@_UserTmp.Address"> </label>
+                            <InputText id="Address" @bind-Value="_UserTmp.Address" />
+                            <ValidationMessage For="() => _UserTmp.Address" />
+                        </p>
+                        <p>
+                            <label for="@_UserTmp.Country"> </label>
+                            <InputText id="Country" @bind-Value="_UserTmp.Country" />
+                            <ValidationMessage For="() => _UserTmp.Country" />
+                        </p>
+                        <p>
+                            <label for="@_UserTmp.City"> </label>
+                            <InputText id="City" @bind-Value="_UserTmp.City" />
+                            <ValidationMessage For="() => _UserTmp.City" />
+                        </p>
+                        <p>
+                            <label for="@_UserTmp.CodeZip"> </label>
+                            <InputText id="CodeZip" @bind-Value="_UserTmp.CodeZip" />
+                            <ValidationMessage For="() => _UserTmp.CodeZip" />
+                        </p>
+                        <p>
+                            <button type="submit" @onclick="()=>UserTmpValidation()">Submit</button>
+                        </p>
+                    </div>
+                </EditForm>
+
+
                 <form>
                     formulaire de paiement  recup infos livraison
                 </form>
@@ -55,35 +100,34 @@
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
+</section>
 
 @code{
-    [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
+    [Inject] ICart carteService { get; set; }
+    [Inject] IOrder orderService { get; set; }
+    [Inject] IShoppingUserTmp shoppingUserTmpService { get; set; }
     [Inject] UserManager<AppUser> userManager { get; set; }
     [Inject] AppUser User { get; set; }
+    private UserTmp _UserTmp { get; set; }
     [Inject] IHttpContextAccessor httpContextAccessor { get; set; }
     private IEnumerable<Product> ProductsIncludePictures { get; set; }
     private Cart LocalCart { get; set; }
     [CascadingParameter]
     private EventCallback notify { get; set; }
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
+        if (firstRender)
+        {
+            ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
+            await ExecuteCheckDisponibility();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+      
+        protected override async Task OnInitializedAsync()
+    {
+        _UserTmp = await shoppingUserTmpService.InitializeShoppingUserTmp();
         LocalCart = await carteService.InitializeShoppingCart();
         User.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
         if (User.UserName != null)
@@ -107,6 +151,22 @@
     protected async Task ExecuteClearCart()
     {
         await carteService.ClearCart();
+        await notify.InvokeAsync();
+    }
+    private async Task UserTmpValidation()
+    {
+        if (
+            _UserTmp.LastName != null && _UserTmp.FirstName != null && _UserTmp.EmailTmp != null
+            && _UserTmp.Address != null && _UserTmp.Country != null && _UserTmp.City != null && _UserTmp.CodeZip != null
+            )
+        {
+
+            await shoppingUserTmpService.TransactionOrderUserTmp();
+        }
+    }
+    protected async Task ExecuteCheckDisponibility()
+    {
+        await carteService.CheckDisponibility();
         await notify.InvokeAsync();
     }
 }

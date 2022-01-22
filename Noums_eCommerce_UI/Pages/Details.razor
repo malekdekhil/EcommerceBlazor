@@ -1,8 +1,8 @@
 ﻿@page  "/details/{idProduct:int}"
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Identity
-
-@if (idProduct > 0)
+<section>
+    @if (idProduct > 0)
 {
     if (product != null)
     {
@@ -23,6 +23,8 @@
         // si produit acheter user peux faire un commentaire
     }
 }
+
+</section>
 
 
 

@@ -76,11 +76,11 @@ namespace ShoppingCart
         }
         public async Task ClearCart()
         {
-            if (_Cart != null)
+            if (_Cart != null && _Cart.ListProducts.Count() > 0)
             {
-                foreach (var cartitem in _Cart.ListProducts.ToList())
+                foreach (var cartItem in _Cart.ListProducts.ToList())
                 {
-                    _Cart.ListProducts.Remove(cartitem);
+                    _Cart.ListProducts.Remove(cartItem);
                 }
                 _Cart.TotalAllItems = _Cart.ListProducts.Sum(a => a.TotalItem);
                 _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
@@ -90,45 +90,62 @@ namespace ShoppingCart
         }
         public async Task DeleteCartItem(int id)
         {
-            _CartItem = _Cart.ListProducts.FirstOrDefault(a => a.ProductId == id);
-            _Cart.ListProducts.Remove(_CartItem);
-            _Cart.TotalAllItems = _Cart.ListProducts.Sum(a => a.TotalItem);
-            _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
-            await LocalStorage.SetAsync("Cart", _Cart);
-            if (_Cart.ListProducts.Count() <= 0)
+            if (id > 0)
             {
-                await LocalStorage.DeleteAsync("Cart");
-                await LocalStorage.SetAsync("Cart", _Cart);
+                _CartItem = _Cart.ListProducts.FirstOrDefault(a => a.ProductId == id);
+                if(_CartItem != null)
+                {
+                    _Cart.ListProducts.Remove(_CartItem);
+                    _Cart.TotalAllItems = _Cart.ListProducts.Sum(a => a.TotalItem);
+                    _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
+                    await LocalStorage.DeleteAsync("Cart");
+                    await LocalStorage.SetAsync("Cart", _Cart);
+                }
             }
         }
         public async Task DeleteItem(int id)
         {
-            if (_Cart != null && _Cart.ListProducts.Count > 0)
-            {
-                _CartItem = _Cart.ListProducts.FirstOrDefault(a => a.ProductId == id);
-            }
-            if (_CartItem != null && _CartItem.ProductQuantity > 0)
+            _CartItem = _Cart.ListProducts.FirstOrDefault(a => a.ProductId == id);
+            if (id > 0 && _CartItem !=null)
             {
                 _CartItem.ProductQuantity = _CartItem.ProductQuantity - 1;
-                _CartItem.TotalItem = _CartItem.TotalItem - _CartItem.ProductPrice;
-                _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
-                _Cart.TotalAllItems = _Cart.ListProducts.Sum(t => t.TotalItem);
-                await LocalStorage.SetAsync("Cart", _Cart);
                 if (_CartItem.ProductQuantity <= 0)
                 {
                     await DeleteCartItem(_CartItem.ProductId);
                 }
+                else
+                {
+                    _CartItem.TotalItem = _CartItem.TotalItem - _CartItem.ProductPrice;
+                    _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
+                    _Cart.TotalAllItems = _Cart.ListProducts.Sum(t => t.TotalItem);
+                    await LocalStorage.SetAsync("Cart", _Cart);
+                }
             }
         }
-        public async Task CheckDisponibility(List<Domains.Product> allProductsEmpty)
+        public async Task CheckDisponibility()
         {
-            if (allProductsEmpty != null)
+            var products = await ProductServices.GetAllProductsAsync();
+            if (_Cart != null && _Cart.ListProducts.Count() > 0 && products != null)
             {
-                foreach (var product in allProductsEmpty.Where(a => a.Quantity <= 0).ToList())
+                foreach (var product in products.Select(a => new { a.IdProduct, a.Quantity, a.SalesPrice }).ToList())
                 {
-                    await DeleteItem(product.IdProduct);
+                    foreach (var cartItem in _Cart.ListProducts.Where(c => c.ProductId == product.IdProduct).ToList())
+                    {
+                        if (product.Quantity <= 0)
+                        {
+                            await DeleteCartItem(cartItem.ProductId);
+                        }
+                        else if (product.Quantity < cartItem.ProductQuantity)
+                        {
+                            while (product.Quantity < cartItem.ProductQuantity)
+                            {
+                                await DeleteItem(cartItem.ProductId);
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
+

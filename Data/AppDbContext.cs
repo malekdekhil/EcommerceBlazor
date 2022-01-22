@@ -26,6 +26,7 @@ namespace Data
             modelBuilder.ApplyConfiguration(new OpinionConfiguration());
             modelBuilder.ApplyConfiguration(new ProviderConfiguration());
             modelBuilder.ApplyConfiguration(new PictureConfiguration());
+            modelBuilder.ApplyConfiguration(new UserTmpConfiguration());
             base.OnModelCreating(modelBuilder);
 
 
@@ -37,5 +38,6 @@ namespace Data
         public DbSet<OrderItem> TbOrderItems { get; set; }
         public DbSet<Picture> TbPictures { get; set; }
         public DbSet<Provider> TbProviders { get; set; }
+        public DbSet<Provider> TbUsersTmp { get; set; }
      }
 }
