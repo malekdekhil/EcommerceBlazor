@@ -1,8 +1,9 @@
 ﻿@inherits LayoutComponentBase
-     <CascadingValue Value="LocalCart">
-        <NavMenu />
-    </CascadingValue>
- <div class="main">
+
+<CascadingValue Value="LocalCart">
+    <NavMenu />
+</CascadingValue>
+<div class="main">
     <div class="content px-4">
         <CascadingValue Value="event_notify">
             @Body
@@ -11,22 +12,37 @@
 </div>
 @code{
     [Inject] ICart carteService { get; set; }
+    [Inject] IProduct productService { get; set; }
     protected Cart LocalCart { get; set; }
     EventCallback event_notify => EventCallback.Factory.Create(this, NotifyLayout);
-    private async Task NotifyLayout()
+    protected override async Task OnInitializedAsync()
     {
         LocalCart = await carteService.InitializeShoppingCart();
+        await base.OnInitializedAsync();
+    }
+    protected override async Task OnParametersSetAsync()
+    {
         if (LocalCart != null)
         {
+            LocalCart = await carteService.UpdateCart(LocalCart,null);
+            await base.OnParametersSetAsync();
+        }
+    }
+    private async Task NotifyLayout()
+    {
+        if (LocalCart != null)
+        {
+            LocalCart = await carteService.InitializeShoppingCart();
+
             StateHasChanged();
         }
     }
+
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await NotifyLayout();
-
         }
     }
 }
