@@ -166,8 +166,8 @@ namespace ShoppingCart
                         }
                     }
                     cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
-                    await LocalStorage.SetAsync("Cart", cart);
                 }
+                await LocalStorage.SetAsync("Cart", cart);
             }
             return cart;
         }
