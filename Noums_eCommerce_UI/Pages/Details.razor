@@ -3,30 +3,33 @@
 @using Microsoft.AspNetCore.Identity
 <section>
     @if (idProduct > 0)
-{
-    if (product != null)
     {
-        <span>@product.Name</span>
-        <span>@product.LongDescription</span>
-        <span>@product.ShortDescription</span>
-        <span>@product.SalesPrice</span>
-        <button class="btn btn-primary" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)">- </button>
-        <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct)"> + </button>
-    }
+        if (product != null)
+        {
+            <span>@product.Name</span>
+            <span>@product.LongDescription</span>
+            <span>@product.ShortDescription</span>
+            <span>@product.SalesPrice</span> if (product.Quantity > 0)
+            {
+                <button class="btn btn-primary" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)">- </button>
+                <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct)"> + </button>
+            }
+            else
+            {
+                <button class="btn btn-primary" type="button">Rupture de sock </button>
+            }
+        }
+        if (@User.UserName != null)
+        {
+            <form>
+                formulaire de commentaire
+            </form>
 
-    if (@User.UserName != null)
-    {
-        <form>
-            formulaire de commentaire
-        </form>
-
-        // si produit acheter user peux faire un commentaire
+            // si produit acheter user peux faire un commentaire
+        }
     }
-}
 
 </section>
-
-
 
 @code {
     [Parameter] public int idProduct { get; set; }
@@ -40,12 +43,28 @@
     private Cart LocalCart { get; set; }
     private Product product { get; set; }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await productService.GetAllProductsIncludePicturesAsync();
+            await ExecuteCheckDisponibility();
+            if (LocalCart != null)
+            {
+                LocalCart = await carteService.UpdateCart(LocalCart,product);
 
+            }
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        LocalCart = await carteService.InitializeShoppingCart();
+        await base.OnParametersSetAsync();
+    }
     protected override async Task OnInitializedAsync()
     {
         product = await productService.GetProductByIdAsync(idProduct);
-        LocalCart = await carteService.InitializeShoppingCart();
-
         User.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
         if (User.UserName != null)
         {
@@ -55,14 +74,20 @@
         await base.OnInitializedAsync();
     }
 
-    protected async Task ExecuteAddtoCart(int IdProduct)
+    private async Task ExecuteAddtoCart(int IdProduct)
     {
         await carteService.AddCart(IdProduct);
         await notify.InvokeAsync();
     }
-    protected async Task ExecuteDeleteCartItem(int IdProduct)
+    private async Task ExecuteDeleteCartItem(int IdProduct)
     {
         await carteService.DeleteItem(IdProduct);
         await notify.InvokeAsync();
     }
+    private async Task ExecuteCheckDisponibility()
+    {
+        await carteService.CheckDisponibility();
+        await notify.InvokeAsync();
+    }
+
 }

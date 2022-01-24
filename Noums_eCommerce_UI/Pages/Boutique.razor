@@ -38,48 +38,49 @@
                     </div>
                 </div>
             }
-
         </div>
     }
 </section>
 @code{
+    [CascadingParameter]
+    private EventCallback notify { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
     private IEnumerable<Product> ProductsIncludePictures { get; set; }
     private Cart LocalCart { get; set; }
-
-    [CascadingParameter]
-    private EventCallback notify { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
+
             await ExecuteCheckDisponibility();
+            if (LocalCart != null)
+            {
+                LocalCart = await carteService.UpdateCart(LocalCart,null);
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         LocalCart = await carteService.InitializeShoppingCart();
-        await base.OnInitializedAsync();
+        await base.OnParametersSetAsync();
     }
-    protected async Task ExecuteAddtoCart(int IdProduct)
+    private async Task ExecuteAddtoCart(int IdProduct)
     {
         await carteService.AddCart(IdProduct);
         await notify.InvokeAsync();
-
     }
-    protected async Task ExecuteDeleteCartItem(int IdProduct)
+    private async Task ExecuteDeleteCartItem(int IdProduct)
     {
         await carteService.DeleteItem(IdProduct);
         await notify.InvokeAsync();
     }
-    protected async Task ExecuteCheckDisponibility()
+    private async Task ExecuteCheckDisponibility()
     {
         await carteService.CheckDisponibility();
         await notify.InvokeAsync();
     }
-
 }

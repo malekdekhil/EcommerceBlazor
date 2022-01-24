@@ -1,5 +1,6 @@
 ﻿@page "/"
-<section class="container-fluid" >
+
+<section class="container-fluid">
     @if (ProductsIncludePictures != null)
     {
         <div class="containerCard">
@@ -43,15 +44,13 @@
     }
 </section>
 
-
 @code{
+    [CascadingParameter]
+    private EventCallback notify { get; set; }
     [Inject] IProduct productService { get; set; }
     [Inject] ICart carteService { get; set; }
     private IEnumerable<Product> ProductsIncludePictures { get; set; }
     private Cart LocalCart { get; set; }
-
-    [CascadingParameter]
-    private EventCallback notify { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -59,27 +58,32 @@
         {
             ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
             await ExecuteCheckDisponibility();
+            if (LocalCart != null)
+            {
+                LocalCart = await carteService.UpdateCart(LocalCart,null);
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
+
     protected override async Task OnInitializedAsync()
     {
-
         LocalCart = await carteService.InitializeShoppingCart();
+
         await base.OnInitializedAsync();
     }
-    protected async Task ExecuteAddtoCart(int IdProduct)
+    private async Task ExecuteAddtoCart(int IdProduct)
     {
         await carteService.AddCart(IdProduct);
         await notify.InvokeAsync();
 
     }
-    protected async Task ExecuteDeleteCartItem(int IdProduct)
+    private async Task ExecuteDeleteCartItem(int IdProduct)
     {
         await carteService.DeleteItem(IdProduct);
         await notify.InvokeAsync();
     }
-    protected async Task ExecuteCheckDisponibility()
+    private async Task ExecuteCheckDisponibility()
     {
         await carteService.CheckDisponibility();
         await notify.InvokeAsync();

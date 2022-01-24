@@ -4,11 +4,8 @@
 
 
 <section>
-
     @if (LocalCart != null)
     {
-
-
         @foreach (var cartItem in LocalCart.ListProducts)
         {
 
@@ -20,22 +17,16 @@
             <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(cartItem.ProductId)"> + </button>
 
         }
-
-
-        @if (LocalCart.TotalAllItems > 0)
+        @if (LocalCart.Total > 0)
         {
-
             <span>Total: @LocalCart.ListProducts.Sum(a => a.TotalItem)</span>
             <button class="btn btn-danger" type="button" @onclick="ExecuteClearCart">vider le panier</button>
 
             @if (@User.UserName != null)
             {
-
-
                 <form>
                     paiement direct
                 </form>
-
             }
             else
             {
@@ -82,8 +73,6 @@
                         </p>
                     </div>
                 </EditForm>
-
-
                 <form>
                     formulaire de paiement  recup infos livraison
                 </form>
@@ -98,8 +87,6 @@
     {
         <p>Votre panier est vide</p>
     }
-
-
 </section>
 
 @code{
@@ -121,34 +108,41 @@
         {
             ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
             await ExecuteCheckDisponibility();
+            if (LocalCart != null)
+            {
+                LocalCart = await carteService.UpdateCart(LocalCart,null);
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
-      
-        protected override async Task OnInitializedAsync()
+
+    protected override async Task OnInitializedAsync()
     {
         _UserTmp = await shoppingUserTmpService.InitializeShoppingUserTmp();
-        LocalCart = await carteService.InitializeShoppingCart();
         User.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
         if (User.UserName != null)
         {
             User = await userManager.FindByNameAsync(User.UserName);
-
         }
         await base.OnInitializedAsync();
     }
-    protected async Task ExecuteAddtoCart(int IdProduct)
+    protected override async Task OnParametersSetAsync()
+    {
+        LocalCart = await carteService.InitializeShoppingCart();
+        await base.OnParametersSetAsync();
+    }
+    private async Task ExecuteAddtoCart(int IdProduct)
     {
         await carteService.AddCart(IdProduct);
         await notify.InvokeAsync();
     }
-    protected async Task ExecuteDeleteCartItem(int IdProduct)
+    private async Task ExecuteDeleteCartItem(int IdProduct)
     {
         await carteService.DeleteItem(IdProduct);
         await notify.InvokeAsync();
     }
 
-    protected async Task ExecuteClearCart()
+    private async Task ExecuteClearCart()
     {
         await carteService.ClearCart();
         await notify.InvokeAsync();
@@ -164,7 +158,7 @@
             await shoppingUserTmpService.TransactionOrderUserTmp();
         }
     }
-    protected async Task ExecuteCheckDisponibility()
+    private async Task ExecuteCheckDisponibility()
     {
         await carteService.CheckDisponibility();
         await notify.InvokeAsync();

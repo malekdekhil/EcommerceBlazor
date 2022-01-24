@@ -24,6 +24,7 @@
         {
             <li class="mx-1 bg-light"><strong>@item.ProductName</strong></li>
             <li class=" mx-1 bg-light mb-2">Quantité(s): @item.ProductQuantity</li>
+            <li class=" mx-1 bg-light mb-2">Total par produit: @item.TotalItem</li>
         }
     }
     else
@@ -33,5 +34,7 @@
     }
 </ul>
 @code{
-    [Parameter] public Cart LocalCart { get; set; }
+    [Parameter]
+    public Cart LocalCart { get; set; }
+
 }
