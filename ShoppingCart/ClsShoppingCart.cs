@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Domains;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Services.Interfaces;
 using System;
@@ -36,18 +37,11 @@ namespace ShoppingCart
             {
                 _Cart = new Cart();
             }
-            var products = await ProductServices.GetAllProductsIncludePicturesAsync();
-            var productById = products.ToList().Where(a => a.IdProduct == id).FirstOrDefault();
+            var productById = await ProductServices.GetProductByIdAsync(id);
             _CartItem = _Cart.ListProducts.Where(a => a.ProductId == productById.IdProduct).FirstOrDefault();
-            if (_CartItem != null)
+            if (_CartItem != null && productById != null)
             {
-                foreach (var session in _Cart.ListProducts.ToList())
-                {
-                    if (session.ProductId == productById.IdProduct && session.ProductPrice != productById.SalesPrice)
-                    {
-                        session.ProductPrice = productById.SalesPrice;
-                    }
-                }
+                _Cart = await UpdateCart(_Cart, productById);
                 if (productById.Quantity > _CartItem.ProductQuantity)
                 {
                     _CartItem.ProductQuantity++;
@@ -70,7 +64,6 @@ namespace ShoppingCart
                 });
             }
             _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
-            _Cart.TotalAllItems = _Cart.ListProducts.Sum(t => t.TotalItem);
             await LocalStorage.SetAsync("Cart", _Cart);
             return _Cart;
         }
@@ -82,7 +75,6 @@ namespace ShoppingCart
                 {
                     _Cart.ListProducts.Remove(cartItem);
                 }
-                _Cart.TotalAllItems = _Cart.ListProducts.Sum(a => a.TotalItem);
                 _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
                 await LocalStorage.DeleteAsync("Cart");
                 await LocalStorage.SetAsync("Cart", _Cart);
@@ -93,10 +85,9 @@ namespace ShoppingCart
             if (id > 0)
             {
                 _CartItem = _Cart.ListProducts.FirstOrDefault(a => a.ProductId == id);
-                if(_CartItem != null)
+                if (_CartItem != null)
                 {
                     _Cart.ListProducts.Remove(_CartItem);
-                    _Cart.TotalAllItems = _Cart.ListProducts.Sum(a => a.TotalItem);
                     _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
                     await LocalStorage.DeleteAsync("Cart");
                     await LocalStorage.SetAsync("Cart", _Cart);
@@ -106,7 +97,7 @@ namespace ShoppingCart
         public async Task DeleteItem(int id)
         {
             _CartItem = _Cart.ListProducts.FirstOrDefault(a => a.ProductId == id);
-            if (id > 0 && _CartItem !=null)
+            if (id > 0 && _CartItem != null)
             {
                 _CartItem.ProductQuantity = _CartItem.ProductQuantity - 1;
                 if (_CartItem.ProductQuantity <= 0)
@@ -117,7 +108,6 @@ namespace ShoppingCart
                 {
                     _CartItem.TotalItem = _CartItem.TotalItem - _CartItem.ProductPrice;
                     _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
-                    _Cart.TotalAllItems = _Cart.ListProducts.Sum(t => t.TotalItem);
                     await LocalStorage.SetAsync("Cart", _Cart);
                 }
             }
@@ -127,7 +117,7 @@ namespace ShoppingCart
             var products = await ProductServices.GetAllProductsAsync();
             if (_Cart != null && _Cart.ListProducts.Count() > 0 && products != null)
             {
-                foreach (var product in products.Select(a => new { a.IdProduct, a.Quantity, a.SalesPrice }).ToList())
+                foreach (var product in products.Select(a => new { a.IdProduct, a.Quantity }).ToList())
                 {
                     foreach (var cartItem in _Cart.ListProducts.Where(c => c.ProductId == product.IdProduct).ToList())
                     {
@@ -145,6 +135,41 @@ namespace ShoppingCart
                     }
                 }
             }
+        }
+
+        public async Task<Cart> UpdateCart(Cart cart, Product product)
+        {
+            if (cart != null)
+            {
+                if (product != null)
+                {
+                    foreach (var c in cart.ListProducts.Where(a => a.ProductId == product.IdProduct))
+                    {
+                        if (c.ProductPrice != product.SalesPrice)
+                        {
+                            c.ProductPrice = product.SalesPrice;
+                            c.TotalItem = (c.ProductPrice * c.ProductQuantity);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var p in await ProductServices.GetAllProductsIncludePicturesAsync())
+                    {
+                        foreach (var c in cart.ListProducts.Where(a => a.ProductId == p.IdProduct))
+                        {
+                            if (c.ProductPrice != p.SalesPrice)
+                            {
+                                c.ProductPrice = p.SalesPrice;
+                                c.TotalItem = (c.ProductPrice * c.ProductQuantity);
+                            }
+                        }
+                    }
+                    cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
+                    await LocalStorage.SetAsync("Cart", cart);
+                }
+            }
+            return cart;
         }
     }
 }
