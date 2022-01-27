@@ -27,7 +27,6 @@ namespace Services.Implementations
         public async Task<IEnumerable<Category>> GetAllCategoryAsync()
         {
             return await unitOfWork.Categories.GetAllAsync();
-
         }
 
         public async ValueTask<Category> GetAllCategoryByIdAsync(int id)

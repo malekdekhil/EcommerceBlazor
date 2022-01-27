@@ -24,7 +24,7 @@
     {
         if (LocalCart != null)
         {
-            LocalCart = await carteService.UpdateCart(LocalCart,null);
+            LocalCart = await carteService.UpdateCartInfos(LocalCart,null);
             await base.OnParametersSetAsync();
         }
     }

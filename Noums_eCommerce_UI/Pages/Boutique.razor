@@ -2,43 +2,16 @@
 <section class="container-fluid">
     @if (ProductsIncludePictures != null)
     {
+        @foreach (var c in categories.ToList())
+        {<p>@c.CategoryName</p>
         <div class="containerCard">
-            @foreach (var product in ProductsIncludePictures.ToList())
+            @foreach (var p in ProductsIncludePictures.Where(a => a.IdCategory_Fk == c.IdCategory).ToList())
             {
-                <div class="cardChild  p-1 containerCard">
-                    <div>
-                        <img src="~/../images/ProductsImages/@product.ImageUrl.ToString()" class="img-fluid" alt="@product.SeoName" />
-                        <p class="card-group  d-flex justify-content-around py-0 my-1">
-                            @foreach (var picture in product.Pictures.ToList())
-                            {
-                                <button @onclick="() => productService.GetPicturePath(picture.IdPictures, product.IdProduct)">
-                                    <img src="~/../images/ProductsImages/Pictures/@picture.UrlPicture" class="img-fluid" style="height:75px" alt="@product.SeoName" />
-                                </button>
-                            }
-                        </p>
-                        <h1 class="cardTitle text-center mb-1">@product.Name *****</h1>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <p class="d-flex justify-content-between bg-dark align-items-center py-0 my-0">
-                                @if (product.Quantity > 0)
-                                {
-                                    <button class="btn btn-dark d-block  " type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct) ">
-                                        Ajouter                             <span>@product.SalesPrice.ToString("C")</span>
-                                    </button>
-                                    <button class="btn btn-dark d-block" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)">-</button>
-                                }
-                                else
-                                {
-                                    <button class="btn btn-dark btnAddAcc d-block">
-                                        Rupture de stock
-                                    </button>
-                                }
-                            </p>
-                            <a href="Details/@product.IdProduct">en savoir plus</a>
-                        </div>
-                    </div>
-                </div>
+              <ProductComponent product="p" />  
             }
         </div>
+
+    }
     }
 </section>
 @code{
@@ -46,22 +19,27 @@
     private EventCallback notify { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
+    [Inject] ICategory categoryService { get; set; }
     private IEnumerable<Product> ProductsIncludePictures { get; set; }
     private Cart LocalCart { get; set; }
+    private IEnumerable<Category> categories { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
-
-            await ExecuteCheckDisponibility();
             if (LocalCart != null)
             {
-                LocalCart = await carteService.UpdateCart(LocalCart,null);
+                LocalCart = await carteService.UpdateCartInfos(LocalCart, null);
             }
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await categoryService.GetAllCategoryAsync();
+        ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
+        await base.OnInitializedAsync();
     }
     protected override async Task OnParametersSetAsync()
     {
@@ -76,11 +54,6 @@
     private async Task ExecuteDeleteCartItem(int IdProduct)
     {
         await carteService.DeleteItem(IdProduct);
-        await notify.InvokeAsync();
-    }
-    private async Task ExecuteCheckDisponibility()
-    {
-        await carteService.CheckDisponibility();
         await notify.InvokeAsync();
     }
 }

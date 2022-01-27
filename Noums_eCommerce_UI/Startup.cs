@@ -74,28 +74,17 @@ namespace Noums_eCommerce_UI
             {
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(720);
             });
-
-
-
-
-
-
             //-------------Add session ne concerne pas blazor---------------------
-
             services.AddSession(options =>
             {
                 options.IOTimeout = TimeSpan.FromMinutes(120);
 
             });
             services.AddDistributedMemoryCache();
-
-
-
             //-------------Add Serives---------------------
             services.AddTransient<AppUser>();
             services.AddTransient<IShoppingUserTmp, ShoppingUserTmp>();
             services.AddTransient<IUserTmp, ClsUserTmp>();
-
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<ICategory, ClsCategory>();
             services.AddTransient<IProduct, ClsProduct>();

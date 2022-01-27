@@ -13,6 +13,7 @@ namespace Business_Logic.Interfaces
         Task<IEnumerable<Product>> GetAllIncludePictures();
         Task<IEnumerable<Product>> GetAllIncludeOpinions();
         Task PicturePath(int idPicture, int idProduct);
+        Task<Product> GetByIdIncludePictures(int idProduct);
 
     }
 }

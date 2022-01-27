@@ -38,5 +38,10 @@ namespace Business_Logic.Repositories
             picture.Product.ImageUrl = "Pictures/" + picture.UrlPicture;
 
         }
+
+        public async Task<Product> GetByIdIncludePictures(int idProduct)
+        {
+            return await db.TbProducts.Include(a => a.Pictures).FirstOrDefaultAsync(a=>a.IdProduct == idProduct);
+        }
     }
 }

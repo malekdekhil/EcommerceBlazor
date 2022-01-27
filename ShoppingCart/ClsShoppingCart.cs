@@ -41,7 +41,7 @@ namespace ShoppingCart
             _CartItem = _Cart.ListProducts.Where(a => a.ProductId == productById.IdProduct).FirstOrDefault();
             if (_CartItem != null && productById != null)
             {
-                _Cart = await UpdateCart(_Cart, productById);
+                _Cart = await UpdateCartInfos(_Cart, productById);
                 if (productById.Quantity > _CartItem.ProductQuantity)
                 {
                     _CartItem.ProductQuantity++;
@@ -117,29 +117,31 @@ namespace ShoppingCart
             var products = await ProductServices.GetAllProductsAsync();
             if (_Cart != null && _Cart.ListProducts.Count() > 0 && products != null)
             {
-                foreach (var product in products.Select(a => new { a.IdProduct, a.Quantity }).ToList())
+                foreach (var p in products.Select(a => new { a.IdProduct, a.Quantity }).ToList())
                 {
-                    foreach (var cartItem in _Cart.ListProducts.Where(c => c.ProductId == product.IdProduct).ToList())
+                    foreach (var cartItem in _Cart.ListProducts.Where(c => c.ProductId == p.IdProduct).ToList())
                     {
-                        if (product.Quantity <= 0)
+                        if (cartItem != null)
                         {
-                            await DeleteCartItem(cartItem.ProductId);
-                        }
-                        else if (product.Quantity < cartItem.ProductQuantity)
-                        {
-                            while (product.Quantity < cartItem.ProductQuantity)
+                            if (p.Quantity <= 0)
                             {
-                                await DeleteItem(cartItem.ProductId);
+                                await DeleteCartItem(cartItem.ProductId);
+                            }
+                            else if (p.Quantity < cartItem.ProductQuantity)
+                            {
+                                while (p.Quantity < cartItem.ProductQuantity)
+                                {
+                                    await DeleteItem(cartItem.ProductId);
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
-        public async Task<Cart> UpdateCart(Cart cart, Product product)
+        public async Task<Cart> UpdateCartInfos(Cart cart, Product product)
         {
-            if (cart != null)
+            if (cart != null && cart.ListProducts.Count() > 0)
             {
                 if (product != null)
                 {

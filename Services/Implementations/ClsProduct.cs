@@ -52,6 +52,11 @@ namespace Services.Implementations
             return await unitOfWork.Products.GetByIdAsync(id);
         }
 
+        public async ValueTask<Product> GetProductByIdIncludePictureAsync(int idProduct)
+        {
+            return await unitOfWork.Products.GetByIdIncludePictures(idProduct);
+        }
+
         public async Task<Product> RemoveProductAsync(Product delProduct)
         {
             unitOfWork.Products.Remove(delProduct);

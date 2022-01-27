@@ -18,5 +18,7 @@ namespace Services.Interfaces
         Task<Product> CreateProductAsync(Product product);
         Task UpdateProductAsync(Product currentProduct, Product newProduct);
         Task GetPicturePath(int idPicture, int idProduct);
+        ValueTask<Product> GetProductByIdIncludePictureAsync(int idProduct);
+
     }
 }
