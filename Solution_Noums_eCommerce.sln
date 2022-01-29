@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Noums_eCommerce_UI", "Noums
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShoppingCart", "ShoppingCart\ShoppingCart.csproj", "{51D03119-353B-4B2B-86CD-F6D152AB3B5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noums_T_U", "Noums_T_U\Noums_T_U.csproj", "{D0C64B73-FFBD-4A6C-9921-7FE14B4D49F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{51D03119-353B-4B2B-86CD-F6D152AB3B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51D03119-353B-4B2B-86CD-F6D152AB3B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51D03119-353B-4B2B-86CD-F6D152AB3B5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0C64B73-FFBD-4A6C-9921-7FE14B4D49F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0C64B73-FFBD-4A6C-9921-7FE14B4D49F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0C64B73-FFBD-4A6C-9921-7FE14B4D49F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0C64B73-FFBD-4A6C-9921-7FE14B4D49F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
