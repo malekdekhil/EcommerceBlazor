@@ -37,9 +37,9 @@
     [CascadingParameter] private EventCallback notify { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
-    [Parameter] public Product product { get; set; }
+    [CascadingParameter] private Product product { get; set; }
     private Cart LocalCart { get; set; }
-    protected override async Task OnParametersSetAsync()
+     protected override async Task OnParametersSetAsync()
     {
         LocalCart = await carteService.InitializeShoppingCart();
         await base.OnParametersSetAsync();

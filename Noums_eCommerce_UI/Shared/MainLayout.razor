@@ -13,36 +13,22 @@
 @code{
     [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
-    protected Cart LocalCart { get; set; }
+    private Cart LocalCart { get; set; }
+    private IEnumerable<Product> Products { get; set; }
     EventCallback event_notify => EventCallback.Factory.Create(this, NotifyLayout);
-    protected override async Task OnInitializedAsync()
-    {
-        LocalCart = await carteService.InitializeShoppingCart();
-        await base.OnInitializedAsync();
-    }
-    protected override async Task OnParametersSetAsync()
-    {
-        if (LocalCart != null)
-        {
-            LocalCart = await carteService.UpdateCartInfos(LocalCart,null);
-            await base.OnParametersSetAsync();
-        }
-    }
-    private async Task NotifyLayout()
-    {
-        if (LocalCart != null)
-        {
-            LocalCart = await carteService.InitializeShoppingCart();
 
-            StateHasChanged();
-        }
-    }
-
-    protected async override Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await NotifyLayout();
         }
+        await base.OnAfterRenderAsync(firstRender);
     }
+    private async Task NotifyLayout()
+    {
+        LocalCart = await carteService.InitializeShoppingCart();
+        await InvokeAsync(StateHasChanged);
+    }
+
 }

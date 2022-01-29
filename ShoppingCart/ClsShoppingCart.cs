@@ -112,8 +112,9 @@ namespace ShoppingCart
                 }
             }
         }
-        public async Task CheckDisponibility()
+        public async Task<bool> CheckDisponibility()
         {
+            bool isChange = false;
             var products = await ProductServices.GetAllProductsAsync();
             if (_Cart != null && _Cart.ListProducts.Count() > 0 && products != null)
             {
@@ -133,11 +134,13 @@ namespace ShoppingCart
                                 {
                                     await DeleteItem(cartItem.ProductId);
                                 }
+                                isChange = true;
                             }
                         }
                     }
                 }
             }
+            return isChange;
         }
         public async Task<Cart> UpdateCartInfos(Cart cart, Product product)
         {

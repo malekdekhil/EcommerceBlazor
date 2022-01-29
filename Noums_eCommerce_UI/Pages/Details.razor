@@ -32,8 +32,8 @@
 </section>
 
 @code {
-    [Parameter] public int idProduct { get; set; }
     [CascadingParameter] private EventCallback notify { get; set; }
+    [Parameter] public int idProduct { get; set; }
     [Inject] IProduct productService { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IHttpContextAccessor httpContextAccessor { get; set; }
@@ -41,7 +41,7 @@
     [Inject] UserManager<AppUser> userManager { get; set; }
     [Inject] AppUser User { get; set; }
     private Cart LocalCart { get; set; }
-    public Product product { get; set; }
+    private Product product { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -51,6 +51,7 @@
     protected override async Task OnInitializedAsync()
     {
         product = await productService.GetProductByIdAsync(idProduct);
+
         if (product == null)
         {
             navigationManager.NavigateTo("/");
