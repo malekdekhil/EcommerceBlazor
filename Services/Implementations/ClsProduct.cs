@@ -57,12 +57,11 @@ namespace Services.Implementations
             return await unitOfWork.Products.GetByIdIncludePictures(idProduct);
         }
 
-        public async Task<Product> RemoveProductAsync(Product delProduct)
+        public async Task RemoveProductAsync(Product delProduct)
         {
             unitOfWork.Products.Remove(delProduct);
             await unitOfWork.CommitAsync();
-            return delProduct;
-        }
+         }
 
         public async Task UpdateProductAsync(Product currentProduct, Product newProduct)
         {

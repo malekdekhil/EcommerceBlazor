@@ -14,7 +14,7 @@ namespace Services.Interfaces
         Task<IEnumerable<Product>> GetAllProductsIncludeOpinionsAsync();
         Task<IEnumerable<Product>> GetAllProductsIncludePicturesAsync();
         ValueTask<Product> GetProductByIdAsync(int id);
-        Task<Product> RemoveProductAsync(Product delProduct);
+        Task RemoveProductAsync(Product delProduct);
         Task<Product> CreateProductAsync(Product product);
         Task UpdateProductAsync(Product currentProduct, Product newProduct);
         Task GetPicturePath(int idPicture, int idProduct);
