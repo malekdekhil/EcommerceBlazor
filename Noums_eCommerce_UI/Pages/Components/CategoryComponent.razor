@@ -1,18 +1,12 @@
-﻿
-
-@if (categories != null)
+﻿@if (categories != null)
 {
     @foreach (var category in categories)
     {
         <li class="nav-item liCategory">
-            @category.CategoryName
+            <a href="/Category/@category.IdCategory">@category.CategoryName</a>
         </li>
     }
 }
-
-
-
-
 
 @code {
     [Inject] public ICategory categoryService { get; set; }
@@ -22,6 +16,4 @@
     {
         categories = await categoryService.GetAllCategoryAsync();
     }
-
-
 }
