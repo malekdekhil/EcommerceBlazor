@@ -39,8 +39,9 @@
     [Inject] IProduct productService { get; set; }
     [CascadingParameter] private Product product { get; set; }
     private Cart LocalCart { get; set; }
-     protected override async Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        product = await productService.GetProductByIdIncludePictureAsync(product.IdProduct);
         LocalCart = await carteService.InitializeShoppingCart();
         await base.OnParametersSetAsync();
     }
@@ -54,4 +55,5 @@
         await carteService.DeleteItem(IdProduct);
         await notify.InvokeAsync();
     }
+
 }
