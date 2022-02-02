@@ -100,7 +100,7 @@ namespace Noums_T_U
         }
         private Product GetProductByIdIncludeCategories(int id)
         {
-            return ProductsIncludeCategories().Result.Where(a => a.IdProduct == id).FirstOrDefault();
+            return ProductsIncludeCategories().Result.FirstOrDefault(a => a.IdProduct == id);
         }
         private async Task<IEnumerable<Product>> ProductsIncludeCategories()
         {
@@ -110,7 +110,6 @@ namespace Noums_T_U
                 new Product{IdProduct=1,IdCategory_Fk=1,Name="product1",Quantity=5,Category=cayegory,ImageUrl="path\\picture1",SalesPrice=15,InPromo=false},
                 new Product{IdProduct=2,IdCategory_Fk=1,Name="product2",Quantity=8,Category=cayegory,ImageUrl="path\\picture2",SalesPrice=23,InPromo=false},
             });
-
         }
         private async Task<IEnumerable<Product>> ProductsIncludePictures()
         {
