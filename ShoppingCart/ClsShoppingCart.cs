@@ -28,8 +28,17 @@ namespace ShoppingCart
         }
         public async Task<Cart> InitializeShoppingCart()
         {
-            var result = await LocalStorage.GetAsync<Cart>("Cart");
-            return _Cart = result.Success ? result.Value : null;
+            try
+            {
+                var result = await LocalStorage.GetAsync<Cart>("Cart");
+                _Cart = result.Success ? result.Value : null;
+            }
+            catch
+            {
+                await LocalStorage.DeleteAsync("Cart");
+                await LocalStorage.SetAsync("Cart", _Cart);
+            }
+            return _Cart;
         }
         public async Task<Cart> AddCart(int id)
         {
@@ -96,21 +105,26 @@ namespace ShoppingCart
         }
         public async Task DeleteItem(int id)
         {
-            _CartItem = _Cart.ListProducts.FirstOrDefault(a => a.ProductId == id);
-            if (id > 0 && _CartItem != null)
+            if (_Cart != null)
             {
-                _CartItem.ProductQuantity = _CartItem.ProductQuantity - 1;
-                if (_CartItem.ProductQuantity <= 0)
+                _CartItem = _Cart.ListProducts.FirstOrDefault(a => a.ProductId == id);
+                if (id > 0 && _CartItem != null)
                 {
-                    await DeleteCartItem(_CartItem.ProductId);
+                    _CartItem.ProductQuantity = _CartItem.ProductQuantity - 1;
+                    if (_CartItem.ProductQuantity <= 0)
+                    {
+                        await DeleteCartItem(_CartItem.ProductId);
+                    }
+                    else
+                    {
+                        _CartItem.TotalItem = _CartItem.TotalItem - _CartItem.ProductPrice;
+                        _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
+                        await LocalStorage.SetAsync("Cart", _Cart);
+                    }
                 }
-                else
-                {
-                    _CartItem.TotalItem = _CartItem.TotalItem - _CartItem.ProductPrice;
-                    _Cart.Total = _Cart.ListProducts.Sum(a => a.TotalItem);
-                    await LocalStorage.SetAsync("Cart", _Cart);
-                }
+
             }
+
         }
         public async Task<bool> CheckDisponibility()
         {
