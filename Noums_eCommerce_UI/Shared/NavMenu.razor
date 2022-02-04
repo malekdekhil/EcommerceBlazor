@@ -79,7 +79,7 @@
 @code {
 
     [CascadingParameter] public Cart LocalCart { get; set; }
-    private string? term{ get; set; }
+    private string term;
     [Inject] NavigationManager navigation { get; set; }
     private void ExecuteSearch()
     {
