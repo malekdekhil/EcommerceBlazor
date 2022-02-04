@@ -18,5 +18,5 @@ namespace ShoppingCart
         Task DeleteItem(int id);
         Task<bool>CheckDisponibility();
         Task<Cart> UpdateCartInfos(Cart cart,Product product);
-    }
+     }
 }

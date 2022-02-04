@@ -1,0 +1,43 @@
+﻿@page "/search/{term}"
+
+<section class="container-fluid">
+    @if (products != null && products.Count() > 0)
+    {
+        <div class="containerCard">
+            @foreach (var product in products.ToList())
+            {
+                <ProductComponent idProduct="@product.IdProduct" />
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center py-2">
+            pas de resultat mais nous vous proposons d'autres produits
+        </p>
+        <div class="containerCard">
+
+            @foreach (var product in productsRandom.ToList())
+            {
+                <ProductComponent idProduct="@product.IdProduct" />
+            }
+        </div>
+    }
+</section>
+@code {
+    private IEnumerable<Product> products { get; set; }
+    private IEnumerable<Product> productsRandom { get; set; }
+    [Inject] IProduct productService { get; set; }
+    [Parameter] public string term { get; set; }
+    protected async override Task OnParametersSetAsync()
+    {
+        products = await productService.GetSearchProducAsync(term);
+        await base.OnParametersSetAsync();
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        productsRandom = await productService.GetRandomProductsAsync();
+        await base.OnInitializedAsync();
+    }
+
+}

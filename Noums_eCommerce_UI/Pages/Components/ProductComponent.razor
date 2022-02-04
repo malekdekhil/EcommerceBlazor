@@ -35,15 +35,20 @@
 }
 @code{
     [CascadingParameter] private EventCallback notify { get; set; }
+    [Parameter] public int idProduct { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
-    [CascadingParameter] private Product product { get; set; }
+    private Product product { get; set; }
     private Cart LocalCart { get; set; }
     protected override async Task OnParametersSetAsync()
     {
-        product = await productService.GetProductByIdIncludePictureAsync(product.IdProduct);
         LocalCart = await carteService.InitializeShoppingCart();
         await base.OnParametersSetAsync();
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        product = await productService.GetProductByIdIncludePictureAsync(idProduct);
+        await base.OnInitializedAsync();
     }
     private async Task ExecuteAddtoCart(int IdProduct)
     {

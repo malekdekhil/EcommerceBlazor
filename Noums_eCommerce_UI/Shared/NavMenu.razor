@@ -17,10 +17,10 @@
                 <ul class="navbar-nav col-lg-6 col-md-5 ml-md-5   w-100   ">
 
                     <li class="nav-item   text-center w-100">
-                        <form asp-action="Search" asp-controller="Product" class=" d-flex mx-auto  ">
-                            <input class="  inputSearch  " name="term" type="search" placeholder="" aria-label="Search">
-                            <button class="btnSearch " type="submit">Trouver</button>
-                        </form>
+                        <div class="d-flex mx-auto ">
+                            <input class="inputSearch" @onkeyup="()=>ExecuteSearch()"  @bind="@term" @bind:event="onchange"   type="search" placeholder="search" aria-label="Search" />
+                            @*<button @onclick="()=>ExecuteSearch()" class="btnSearch " type="button">Trouver</button>*@
+                        </div>
                     </li>
                 </ul>
                 <ul class="navbar-nav col-lg-2 col-md-4  col-sm-4 mx-md-auto ">
@@ -29,7 +29,7 @@
                             <i class="icofont-ui-user"></i>
                         </a>
                         <ul class="dropdown-menu text-center w-100" aria-labelledby="navbarDropdown">
-                            <LoginDisplay/>
+                            <LoginDisplay />
                         </ul>
                     </li>
                     <li class="nav-item  text-center ">
@@ -79,5 +79,19 @@
 @code {
 
     [CascadingParameter] public Cart LocalCart { get; set; }
-    
+    private string? term{ get; set; }
+    [Inject] NavigationManager navigation { get; set; }
+    private void ExecuteSearch()
+    {
+        if(term!= null)
+        {
+            navigation.NavigateTo($"search/{term}");
+
+        }
+
+    }
+
+
+
+
 }

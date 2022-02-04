@@ -1,12 +1,13 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
- 
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
- 
 }
-section{
-    margin-top:100px;
+
+section {
+    margin-top: 100px;
 }
+
 a, .btn-link {
     color: #0366d6;
 }
@@ -54,15 +55,17 @@ a, .btn-link {
 
 .containerCard {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    margin: 5px 0px;
 }
+
 .cardTitle {
     font-size: 1.6rem;
     font-weight: 400;
 }
- 
+
 /*btn*/
 .btnAddAcc {
     border-radius: 1rem;
@@ -72,7 +75,7 @@ a, .btn-link {
 }
 
     .btnAddAcc:hover {
-         background: #000000;
+        background: #000000;
         transition: all 1s ease-in;
         border: none;
         box-shadow: 0 .25rem .75rem rgb(128 128 128);

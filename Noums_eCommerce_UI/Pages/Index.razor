@@ -5,11 +5,9 @@
     {
         <div class="containerCard">
             @foreach (var product in ProductsIncludePictures.ToList())
-            {
-            <CascadingValue Value="product">
-                <ProductComponent />
-            </CascadingValue>
-            }
+            { 
+                     <ProductComponent idProduct="@product.IdProduct"/>
+             }
         </div>
     }
     else
@@ -26,9 +24,7 @@
     protected override async Task OnInitializedAsync()
     {
         ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
-
         await base.OnInitializedAsync();
     }
-
-   }
+}
 

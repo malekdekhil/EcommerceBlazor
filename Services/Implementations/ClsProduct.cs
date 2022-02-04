@@ -44,7 +44,7 @@ namespace Services.Implementations
 
         public async Task GetPicturePath(int idPicture, int idProduct)
         {
-            await unitOfWork.Products.PicturePath(idPicture,idProduct);
+            await unitOfWork.Products.PicturePath(idPicture, idProduct);
         }
 
         public async ValueTask<Product> GetProductByIdAsync(int id)
@@ -57,11 +57,22 @@ namespace Services.Implementations
             return await unitOfWork.Products.GetByIdIncludePictures(idProduct);
         }
 
+        public async Task<IEnumerable<Product>> GetRandomProductsAsync()
+        {
+            return await unitOfWork.Products.GetRandomProducts();
+
+        }
+
+        public async Task<IEnumerable<Product>> GetSearchProducAsync(string term)
+        {
+            return await unitOfWork.Products.GetSearchProducts(term);
+        }
+
         public async Task RemoveProductAsync(Product delProduct)
         {
             unitOfWork.Products.Remove(delProduct);
             await unitOfWork.CommitAsync();
-         }
+        }
 
         public async Task UpdateProductAsync(Product currentProduct, Product newProduct)
         {

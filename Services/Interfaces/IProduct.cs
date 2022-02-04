@@ -19,6 +19,9 @@ namespace Services.Interfaces
         Task UpdateProductAsync(Product currentProduct, Product newProduct);
         Task GetPicturePath(int idPicture, int idProduct);
         ValueTask<Product> GetProductByIdIncludePictureAsync(int idProduct);
+        Task<IEnumerable<Product>> GetSearchProducAsync(string term);
+        Task<IEnumerable<Product>> GetRandomProductsAsync();
+
 
     }
 }

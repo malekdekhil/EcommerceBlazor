@@ -43,5 +43,21 @@ namespace Business_Logic.Repositories
         {
             return await db.TbProducts.Include(a => a.Pictures).FirstOrDefaultAsync(a=>a.IdProduct == idProduct);
         }
+
+        public async Task<IEnumerable<Product>> GetSearchProducts(string term)
+        {
+            return await db.TbProducts.Include(c => c.Category)
+                        .Where(
+                            n => n.Name.Contains(term)
+                            || n.LongDescription.Contains(term) || n.ShortDescription.Contains(term)
+                            || n.Category.CategoryName.Contains(term) || n.Category.SeoNameCategory.Contains(term)
+                            || n.Category.Description.Contains(term) || n.SeoName.Contains(term)
+                                ).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> GetRandomProducts()
+        {
+             return await Task.FromResult( db.TbProducts.AsEnumerable().OrderBy(x => new Random().Next()).ToList().Take(3));
+          }
     }
 }

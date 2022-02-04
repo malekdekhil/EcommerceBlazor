@@ -7,10 +7,8 @@
         </li>
     }
 }
-
 @code {
     [Inject] public ICategory categoryService { get; set; }
-
     public IEnumerable<Domains.Category> categories { get; set; }
     protected override async Task OnInitializedAsync()
     {

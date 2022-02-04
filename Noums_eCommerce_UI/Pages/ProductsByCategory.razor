@@ -5,18 +5,15 @@
         <div class="containerCard">
             @foreach (var product in ProductsIncludePictures.Where(a => a.IdCategory_Fk == idCategory).ToList())
             {
-                <CascadingValue Value="product">
-                    <ProductComponent />
-                </CascadingValue>
-            }
+                         <ProductComponent idProduct="@product.IdProduct" />
+             }
         </div>
 
     }
     
 </section>
 @code{
-    [CascadingParameter]
-    private EventCallback notify { get; set; }
+
     [Parameter] public int idCategory { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
@@ -27,14 +24,5 @@
         ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
         await base.OnInitializedAsync();
     }
-    private async Task ExecuteAddtoCart(int IdProduct)
-    {
-        await carteService.AddCart(IdProduct);
-        await notify.InvokeAsync();
-    }
-    private async Task ExecuteDeleteCartItem(int IdProduct)
-    {
-        await carteService.DeleteItem(IdProduct);
-        await notify.InvokeAsync();
-    }
+
 }

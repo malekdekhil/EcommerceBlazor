@@ -8,39 +8,25 @@
             <div class="containerCard">
                 @foreach (var product in ProductsIncludePictures.Where(a => a.IdCategory_Fk == c.IdCategory).ToList())
                 {
-                    <CascadingValue Value="product">
-                        <ProductComponent />
-                    </CascadingValue>
-                }
+                         <ProductComponent idProduct="@product.IdProduct" />
+                 }
             </div>
 
         }
     }
 </section>
-@code{
-    [CascadingParameter]
-    private EventCallback notify { get; set; }
-    [Inject] ICart carteService { get; set; }
+@code{   
+
     [Inject] IProduct productService { get; set; }
     [Inject] ICategory categoryService { get; set; }
     private IEnumerable<Product> ProductsIncludePictures { get; set; }
-    private Cart LocalCart { get; set; }
     private IEnumerable<Category> categories { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        categories = await categoryService.GetAllCategoryAsync();
         ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
+        categories = await categoryService.GetAllCategoryAsync();
         await base.OnInitializedAsync();
     }
-    private async Task ExecuteAddtoCart(int IdProduct)
-    {
-        await carteService.AddCart(IdProduct);
-        await notify.InvokeAsync();
-    }
-    private async Task ExecuteDeleteCartItem(int IdProduct)
-    {
-        await carteService.DeleteItem(IdProduct);
-        await notify.InvokeAsync();
-    }
+
+
 }

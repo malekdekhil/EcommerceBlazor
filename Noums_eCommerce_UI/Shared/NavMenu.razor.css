@@ -76,11 +76,12 @@ a {
 
 .inputSearch {
     border-bottom: 1px solid lightgray;
-    border-left: 1px solid lightgray;
+    border-left: none;
+    border-top: none;
     border-right: none;
-    border-top: 1px solid lightgray;
     width: 100%;
 }
+
 
 .btnSearch {
     border-bottom: 1px solid lightgray;
