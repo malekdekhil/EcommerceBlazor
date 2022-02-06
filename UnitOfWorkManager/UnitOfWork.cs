@@ -15,8 +15,8 @@ namespace UnitOfWorkManager
         private AppDbContext db;
         private IProductRepository _Products;
         private IPictureRepository _Pictures;
+        private IOpinionRepository _Opinions;
         private IRepository<Category> _Categories;
-        private IRepository<Opinion> _Opinions;
         private IRepository<Order> _Orders;
         private IRepository<OrderItem> _OrderItems;
         private IRepository<Provider> _Providers;
@@ -28,7 +28,7 @@ namespace UnitOfWorkManager
         
         public IProductRepository Products => _Products = _Products ?? new ProductRepository(db);
         public IRepository<Category> Categories => _Categories = _Categories ?? new Repository<Category>(db);
-        public IRepository<Opinion> Opinions => _Opinions = _Opinions ?? new Repository<Opinion>(db);
+        public IOpinionRepository Opinions => _Opinions = _Opinions ?? new  OpinionRepository(db);
         public IRepository<Order> Orders => _Orders = _Orders ?? new Repository<Order>(db);
         public IRepository<OrderItem> OrderItems => _OrderItems = _OrderItems ?? new Repository<OrderItem>(db);
         public IPictureRepository Pictures => _Pictures = _Pictures ?? new PictureRepository(db);

@@ -1,25 +1,43 @@
-﻿@if (@product != null)
+﻿@if (@productVm.product != null)
 {
     <div class="cardChild  p-1 containerCard">
         <div>
-            <img src="~/../images/ProductsImages/@product.ImageUrl.ToString()" class="img-fluid" alt="@product.SeoName" />
+            <img src="~/../images/ProductsImages/@productVm.product.ImageUrl.ToString()" class="img-fluid" alt="@productVm.product.SeoName" />
             <p class="card-group  d-flex justify-content-around py-0 my-1">
-                @foreach (var picture in product.Pictures.ToList())
+                @foreach (var picture in productVm.product.Pictures)
                 {
-                    <button @onclick="() => productService.GetPicturePath(picture.IdPictures, product.IdProduct)">
-                        <img src="~/../images/ProductsImages/Pictures/@picture.UrlPicture" class="img-fluid" style="height:75px" alt="@product.SeoName" />
+                    <button @onclick="() => productService.GetPicturePath(picture.IdPictures, productVm.product.IdProduct)">
+                        <img src="~/../images/ProductsImages/Pictures/@picture.UrlPicture" class="img-fluid" style="height:75px" alt="@productVm.product.SeoName" />
                     </button>
                 }
             </p>
-            <h1 class="cardTitle text-center mb-1">@product.Name *****</h1>
+            <span>
+
+            </span>
+
+            <h1 class="cardTitle text-center mb-1">
+                <span>@productVm.product.Name</span>
+
+                @if (productVm.opinions.Select(a => a.Note).Count() > 0 && productVm.opinions != null)
+                {
+                    <span style="color:gold">
+                        @for (int i = 1; i <= @ExecuteNoteByProduct().Result; i++)
+                        {
+                            <i class="icofont-star"></i>
+
+                        }
+                    </span>
+                }
+
+            </h1>
             <div class="d-flex justify-content-between align-items-center">
                 <p class="d-flex justify-content-between bg-dark align-items-center py-0 my-0">
-                    @if (product.Quantity > 0)
+                    @if (productVm.product.Quantity > 0)
                     {
-                        <button class="btn btn-dark d-block" type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct) ">
-                            Ajouter                             <span>@product.SalesPrice.ToString("C")</span>
+                        <button class="btn btn-dark d-block" type="button" @onclick="() => ExecuteAddtoCart(productVm.product.IdProduct) ">
+                            Ajouter                             <span>@productVm.product.SalesPrice.ToString("C")</span>
                         </button>
-                        <button class="btn btn-dark   d-block" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)">-</button>
+                        <button class="btn btn-dark   d-block" type="button" @onclick="() => ExecuteDeleteCartItem(productVm.product.IdProduct)">-</button>
                     }
                     else
                     {
@@ -28,7 +46,7 @@
                         </button>
                     }
                 </p>
-                <a href="Details/@product.IdProduct">en savoir plus</a>
+                <a href="Details/@productVm.product.IdProduct">en savoir plus</a>
             </div>
         </div>
     </div>
@@ -38,16 +56,18 @@
     [Parameter] public int idProduct { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IProduct productService { get; set; }
-    private Product product { get; set; }
-    private Cart LocalCart { get; set; }
+    [Inject] IOpignion opinionService { get; set; }
+    private ProductVm productVm = new ProductVm();
+
     protected override async Task OnParametersSetAsync()
     {
-        LocalCart = await carteService.InitializeShoppingCart();
+        productVm.LocalCart = await carteService.InitializeShoppingCart();
         await base.OnParametersSetAsync();
     }
     protected async override Task OnInitializedAsync()
     {
-        product = await productService.GetProductByIdIncludePictureAsync(idProduct);
+        productVm.product = await productService.GetProductByIdIncludePictureAsync(idProduct);
+        productVm.opinions = await opinionService.GetOpinionsByProductAsync(productVm.product.IdProduct);
         await base.OnInitializedAsync();
     }
     private async Task ExecuteAddtoCart(int IdProduct)
@@ -60,5 +80,8 @@
         await carteService.DeleteItem(IdProduct);
         await notify.InvokeAsync();
     }
-
+    private async Task<double> ExecuteNoteByProduct()
+    {
+        return await Task.FromResult(productVm.opinions.FirstOrDefault(a => a.Note > 0).Note != 0 ? Math.Round(productVm.opinions.Sum(a => a.Note) / productVm.opinions.Count()) : 0);
+    }
 }

@@ -1,32 +1,93 @@
 ﻿@page  "/details/{idProduct:int}"
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Identity
+ 
 <section>
+
     @if (idProduct > 0)
     {
-        if (product != null)
+        if (detailsVm.product != null)
         {
-            <span>@product.Name</span>
-            <span>@product.LongDescription</span>
-            <span>@product.ShortDescription</span>
-            <span>@product.SalesPrice</span> if (product.Quantity > 0)
+            <span>@detailsVm.product.Name</span>
+            @if (detailsVm.OpinionsByProduct.Select(a => a.Note).Count() > 0 && detailsVm.OpinionsByProduct != null)
             {
-                <button class="btn btn-primary" type="button" @onclick="() => ExecuteDeleteCartItem(product.IdProduct)"> - </button>
-                <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(product.IdProduct)"> + </button>
+                <span style="color:gold">
+                    @for (int i = 1; i <= @ExecuteNoteByProduct().Result; i++)
+                    {
+                        <i class="icofont-star"></i>
+                    }
+                </span>
+            }
+            <span>@detailsVm.product.LongDescription</span>
+            <span>@detailsVm.product.ShortDescription</span>
+            <span>@detailsVm.product.SalesPrice</span> if (detailsVm.product.Quantity > 0)
+            {
+                <button class="btn btn-primary" type="button" @onclick="() => ExecuteDeleteCartItem(detailsVm.product.IdProduct)"> - </button>
+                <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(detailsVm.product.IdProduct)"> + </button>
             }
             else
             {
                 <button class="btn btn-primary" type="button">Rupture de sock </button>
             }
         }
-        if (@User.UserName != null)
-        {
-            <form>
-                formulaire de commentaire
-            </form>
 
-            // si produit acheter user peux faire un commentaire
-        }
+    }
+    @if (detailsVm.OpinionsByProduct != null)
+    {
+        <div class="my-5 pt-3">
+            @foreach (var avis in detailsVm.OpinionsByProduct)
+            {
+                <div class="text-center my-4 bg-light">
+                    <div>
+                        <p>
+                            <i>@avis.UserName </i>
+                            @for (int i = 1; i <= avis.Note; i++)
+                            {
+                                <span style="color:gold"><i class="icofont-star"></i></span>
+                            }
+                        </p>
+                    </div>
+                    <div>@avis.Commentaire</div>
+                </div>
+
+            }
+        </div>
+    }
+
+
+    @if (@User.UserName != null)
+    {
+        <EditForm Model="@detailsVm.opinion">
+            <DataAnnotationsValidator />
+            <div class="d-flex flex-column align-items-center w-50">
+                <p>
+                    <label for="@detailsVm.opinion.Commentaire"> </label>
+                    <InputTextArea @bind-Value="detailsVm.opinion.Commentaire" />
+                    <ValidationMessage For="() => detailsVm.opinion.Commentaire" />
+                </p>
+                <p>
+                    <label for="@detailsVm.opinion.Note"> </label>
+                    <ValidationMessage For="() => detailsVm.opinion.Note" />
+                    <div class="form-group">
+                        <label>Donnez une note: </label>
+
+                        <InputSelect @bind-Value="detailsVm.opinion.Note" class="form-control">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                        </InputSelect>
+                    </div>
+
+                </p>
+
+
+                <p>
+                    <button type="submit" @onclick="() => OpinionValidation()">Submit</button>
+                </p>
+            </div>
+        </EditForm>
     }
 
 </section>
@@ -37,31 +98,41 @@
     [Inject] IProduct productService { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IHttpContextAccessor httpContextAccessor { get; set; }
+    [Inject] IOpignion opinionService { get; set; }
     [Inject] NavigationManager navigationManager { get; set; }
     [Inject] UserManager<AppUser> userManager { get; set; }
     [Inject] AppUser User { get; set; }
-    private Cart LocalCart { get; set; }
-    private Product product { get; set; }
+    private DetailsVm detailsVm = new DetailsVm();
 
     protected override async Task OnParametersSetAsync()
     {
-        LocalCart = await carteService.InitializeShoppingCart();
+        detailsVm.LocalCart = await carteService.InitializeShoppingCart();
+
         await base.OnParametersSetAsync();
+    }
+    protected override void OnInitialized()
+    {
+        if (User != null)
+        {
+            detailsVm.opinion = new Opinion();
+        }
+        base.OnInitialized();
     }
     protected override async Task OnInitializedAsync()
     {
-        product = await productService.GetProductByIdAsync(idProduct);
-
-        if (product == null)
+        try
+        {
+            detailsVm.product = await productService.GetProductByIdAsync(idProduct);
+            detailsVm.OpinionsByProduct = await opinionService.GetOpinionsByProductAsync(detailsVm.product.IdProduct);
+        }
+        catch
         {
             navigationManager.NavigateTo("/");
-
         }
         User.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
         if (User.UserName != null)
         {
             User = await userManager.FindByNameAsync(User.UserName);
-
         }
         await base.OnInitializedAsync();
     }
@@ -76,4 +147,21 @@
         await carteService.DeleteItem(IdProduct);
         await notify.InvokeAsync();
     }
+    private async Task OpinionValidation()
+    {
+        if (detailsVm.opinion.Note > 0)
+        {
+            detailsVm.opinion.IdProduct_Fk = detailsVm.product.IdProduct;
+            detailsVm.opinion.UserName = User.UserName;
+            await opinionService.CreateOpinionyAsync(detailsVm.opinion);
+            navigationManager.NavigateTo("/details/"+ detailsVm.product.IdProduct, forceLoad: true);
+        }
+    }
+
+    private async Task<double> ExecuteNoteByProduct()
+    {
+        return await Task.FromResult(detailsVm.OpinionsByProduct.FirstOrDefault(a => a.Note > 0).Note != 0 ? Math.Round(detailsVm.OpinionsByProduct.Sum(a => a.Note) / detailsVm.OpinionsByProduct.Count()) : 0);
+
+    }
+
 }

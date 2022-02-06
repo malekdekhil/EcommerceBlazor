@@ -3,13 +3,13 @@
 @using Microsoft.AspNetCore.Identity
 
 <section>
-    @if (LocalCart != null)
+    @if (orderVm.LocalCart != null)
     {
-        if (dispoIsChanged == true)
+        if (orderVm.dispoIsChanged == true)
         {
             <p>Nous avons modifié certain(s) produit(s) votre panier est mis à jour<button type="button" @onclick="ResetIsMessage">compris !</button></p>
         }
-        @foreach (var cartItem in LocalCart.ListProducts)
+        @foreach (var cartItem in orderVm.LocalCart.ListProducts)
         {
             <p>name: @cartItem.ProductName</p>
             <p>quantity:@cartItem.ProductQuantity </p>
@@ -18,9 +18,9 @@
             <button class="btn btn-primary" type="button" @onclick="() => ExecuteDeleteCartItem(cartItem.ProductId)">- </button>
             <button class="btn btn-primary" type="button" @onclick="() => ExecuteAddtoCart(cartItem.ProductId)"> + </button>
         }
-        @if (LocalCart.Total > 0)
+        @if (orderVm.LocalCart.Total > 0)
         {
-            <span>Total: @LocalCart.ListProducts.Sum(a => a.TotalItem)</span>
+            <span>Total: @orderVm.LocalCart.ListProducts.Sum(a => a.TotalItem)</span>
             <button class="btn btn-danger" type="button" @onclick="ExecuteClearCart">vider le panier</button>
 
             @if (@User.UserName != null)
@@ -31,43 +31,43 @@
             }
             else
             {
-                <EditForm Model="@_UserTmp">
+                <EditForm Model="@orderVm.userTmp">
                     <DataAnnotationsValidator />
                     <div class="d-flex flex-column align-items-center w-50">
                         <p>
-                            <label for="@_UserTmp.FirstName"> </label>
-                            <InputText @bind-Value="_UserTmp.FirstName" />
-                            <ValidationMessage For="() => _UserTmp.FirstName" />
+                            <label for="@orderVm.userTmp.FirstName"> </label>
+                            <InputText @bind-Value="orderVm.userTmp.FirstName" />
+                            <ValidationMessage For="() => orderVm.userTmp.FirstName" />
                         </p>
                         <p>
-                            <label for="@_UserTmp.LastName"> </label>
-                            <InputText @bind-Value="_UserTmp.LastName" />
-                            <ValidationMessage For="() => _UserTmp.LastName" />
+                            <label for="@orderVm.userTmp.LastName"> </label>
+                            <InputText @bind-Value="orderVm.userTmp.LastName" />
+                            <ValidationMessage For="() => orderVm.userTmp.LastName" />
                         </p>
                         <p>
-                            <label for="@_UserTmp.EmailTmp"> </label>
-                            <InputText @bind-Value="_UserTmp.EmailTmp" />
-                            <ValidationMessage For="() => _UserTmp.EmailTmp" />
+                            <label for="@orderVm.userTmp.EmailTmp"> </label>
+                            <InputText @bind-Value="orderVm.userTmp.EmailTmp" />
+                            <ValidationMessage For="() => orderVm.userTmp.EmailTmp" />
                         </p>
                         <p>
-                            <label for="@_UserTmp.Address"> </label>
-                            <InputText @bind-Value="_UserTmp.Address" />
-                            <ValidationMessage For="() => _UserTmp.Address" />
+                            <label for="@orderVm.userTmp.Address"> </label>
+                            <InputText @bind-Value="orderVm.userTmp.Address" />
+                            <ValidationMessage For="() => orderVm.userTmp.Address" />
                         </p>
                         <p>
-                            <label for="@_UserTmp.Country"> </label>
-                            <InputText @bind-Value="_UserTmp.Country" />
-                            <ValidationMessage For="() => _UserTmp.Country" />
+                            <label for="@orderVm.userTmp.Country"> </label>
+                            <InputText @bind-Value="orderVm.userTmp.Country" />
+                            <ValidationMessage For="() => orderVm.userTmp.Country" />
                         </p>
                         <p>
-                            <label for="@_UserTmp.City"> </label>
-                            <InputText @bind-Value="_UserTmp.City" />
-                            <ValidationMessage For="() => _UserTmp.City" />
+                            <label for="@orderVm.userTmp.City"> </label>
+                            <InputText @bind-Value="orderVm.userTmp.City" />
+                            <ValidationMessage For="() => orderVm.userTmp.City" />
                         </p>
                         <p>
-                            <label for="@_UserTmp.CodeZip"> </label>
-                            <InputText @bind-Value="_UserTmp.CodeZip" />
-                            <ValidationMessage For="() => _UserTmp.CodeZip" />
+                            <label for="@orderVm.userTmp.CodeZip"> </label>
+                            <InputText @bind-Value="orderVm.userTmp.CodeZip" />
+                            <ValidationMessage For="() => orderVm.userTmp.CodeZip" />
                         </p>
                         <p>
                             <button type="submit" @onclick="()=>UserTmpValidation()">Submit</button>
@@ -89,26 +89,22 @@
 </section>
 
 @code{
+    [CascadingParameter] private EventCallback notify { get; set; }
     [Inject] ICart carteService { get; set; }
     [Inject] IOrder orderService { get; set; }
     [Inject] IShoppingUserTmp shoppingUserTmpService { get; set; }
     [Inject] UserManager<AppUser> userManager { get; set; }
     [Inject] AppUser User { get; set; }
-    private UserTmp _UserTmp { get; set; }
     [Inject] IHttpContextAccessor httpContextAccessor { get; set; }
-    private IEnumerable<Product> ProductsIncludePictures { get; set; }
-    private Cart LocalCart { get; set; }
-    private bool dispoIsChanged = false;
-    [CascadingParameter]
-    private EventCallback notify { get; set; }
+    private OrderVm orderVm = new OrderVm();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            if (LocalCart != null)
+            if (orderVm.LocalCart != null)
             {
-                LocalCart = await carteService.UpdateCartInfos(LocalCart, null);
+                orderVm.LocalCart = await carteService.UpdateCartInfos(orderVm.LocalCart, null);
                 await ExecuteCheckDisponibility();
                 await notify.InvokeAsync();
             }
@@ -117,8 +113,8 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        LocalCart = await carteService.InitializeShoppingCart();
-        _UserTmp = await shoppingUserTmpService.InitializeShoppingUserTmp();
+        orderVm.LocalCart = await carteService.InitializeShoppingCart();
+        orderVm.userTmp = await shoppingUserTmpService.InitializeShoppingUserTmp();
         User.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
         if (User.UserName != null)
         {
@@ -145,8 +141,8 @@
     private async Task UserTmpValidation()
     {
         if (
-            _UserTmp.LastName != null && _UserTmp.FirstName != null && _UserTmp.EmailTmp != null
-            && _UserTmp.Address != null && _UserTmp.Country != null && _UserTmp.City != null && _UserTmp.CodeZip != null
+            orderVm.userTmp.LastName != null && orderVm.userTmp.FirstName != null && orderVm.userTmp.EmailTmp != null
+            && orderVm.userTmp.Address != null && orderVm.userTmp.Country != null && orderVm.userTmp.City != null && orderVm.userTmp.CodeZip != null
             )
         {
             await shoppingUserTmpService.TransactionOrderUserTmp();
@@ -154,11 +150,11 @@
     }
     private async Task ExecuteCheckDisponibility()
     {
-        dispoIsChanged = await carteService.CheckDisponibility();
+        orderVm.dispoIsChanged = await carteService.CheckDisponibility();
         await notify.InvokeAsync();
     }
     private void ResetIsMessage()
     {
-        dispoIsChanged = false;
+        orderVm.dispoIsChanged = false;
     }
 }

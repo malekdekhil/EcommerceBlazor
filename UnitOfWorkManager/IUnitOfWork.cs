@@ -12,7 +12,7 @@ namespace UnitOfWorkManager
     {
         IRepository<Category> Categories { get; }
         IProductRepository Products { get; }
-        IRepository<Opinion> Opinions { get; }
+        IOpinionRepository Opinions { get; }
         IRepository<Order> Orders { get; }
         IRepository<OrderItem> OrderItems { get; }
         IPictureRepository Pictures { get; }

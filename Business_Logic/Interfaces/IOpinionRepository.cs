@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Business_Logic.Interfaces
 {
-   public interface IPictureRepository: IRepository<Picture>
+   public interface IOpinionRepository: IRepository<Opinion>
     {
-        Task<Picture> GetByName(string Name);
+        Task<IEnumerable<Opinion>> GetOpinionsByProduct(int idProduct);
+
     }
 }

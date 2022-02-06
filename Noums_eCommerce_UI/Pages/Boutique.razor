@@ -1,12 +1,12 @@
 ﻿@page "/Boutique"
 <section class="container-fluid">
-    @if (ProductsIncludePictures != null)
+    @if (boutiqueVm.ProductsIncludePictures != null)
     {
-        @foreach (var c in categories.ToList())
+        @foreach (var c in boutiqueVm.categories)
         {
             <p>@c.CategoryName</p>
             <div class="containerCard">
-                @foreach (var product in ProductsIncludePictures.Where(a => a.IdCategory_Fk == c.IdCategory).ToList())
+                @foreach (var product in boutiqueVm.ProductsIncludePictures.Where(a => a.IdCategory_Fk == c.IdCategory).ToList())
                 {
                          <ProductComponent idProduct="@product.IdProduct" />
                  }
@@ -19,12 +19,12 @@
 
     [Inject] IProduct productService { get; set; }
     [Inject] ICategory categoryService { get; set; }
-    private IEnumerable<Product> ProductsIncludePictures { get; set; }
-    private IEnumerable<Category> categories { get; set; }
+    private BoutiqueVm boutiqueVm = new BoutiqueVm();
+   
     protected override async Task OnInitializedAsync()
     {
-        ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
-        categories = await categoryService.GetAllCategoryAsync();
+        boutiqueVm.ProductsIncludePictures = await productService.GetAllProductsIncludePicturesAsync();
+        boutiqueVm.categories = await categoryService.GetAllCategoryAsync();
         await base.OnInitializedAsync();
     }
 

@@ -25,7 +25,7 @@ namespace Services.Implementations
             return Opinion;
         }
 
-        public async ValueTask<Opinion> GetAllOpinionByIdAsync(int id)
+        public async ValueTask<Opinion> GetOpinionByIdAsync(int id)
         {
              return await unitOfWork.Opinions.GetByIdAsync(id);
         }
@@ -33,6 +33,11 @@ namespace Services.Implementations
         public async Task<IEnumerable<Opinion>> GetAllOpinionyAsync()
         {
             return await unitOfWork.Opinions.GetAllAsync();
+        }
+
+        public async Task<IEnumerable<Opinion>> GetOpinionsByProductAsync(int idProduct)
+        {
+            return await unitOfWork.Opinions.GetOpinionsByProduct(idProduct);
         }
 
         public async Task<Opinion> RemoveOpinionAsync(Opinion delOpinion)

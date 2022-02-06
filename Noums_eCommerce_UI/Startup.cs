@@ -20,6 +20,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnitOfWorkManager;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using Noums_eCommerce_UI.Pages.ViewModels;
 
 namespace Noums_eCommerce_UI
 {
